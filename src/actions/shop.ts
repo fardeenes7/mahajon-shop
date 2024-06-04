@@ -1,13 +1,19 @@
 "use server";
-import { headers } from "next/headers";
-import { cookies } from "next/headers";
 
-export async function getShopFromSlug(slug: string) {
-    cookies().set("shopSlug", slug);
-    return { slug };
-}
+import { cookies, headers } from "next/headers";
 
-export async function getShopFromDomain(domain: string) {
-    cookies().set("shopSlug", domain);
-    return { domain };
+export async function getShopInfo() {
+    const siteHost = headers().get("host");
+    try {
+        const res = await fetch(
+            `${process.env.API_BASE_URL}/shop/${siteHost}/`
+        );
+        const data = await res.json();
+        if (res.ok && data) {
+            return data;
+        }
+        return null;
+    } catch (error) {
+        return null;
+    }
 }
